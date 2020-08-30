@@ -3,7 +3,6 @@ package co.com.udem.agenciainmobiliariaclient.rest.controller;
 import java.math.BigInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,25 +23,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 import co.com.udem.agenciainmobiliariaclient.domain.PropiedadDTO;
 import co.com.udem.agenciainmobiliariaclient.entities.UserToken;
 import co.com.udem.agenciainmobiliariaclient.repositories.UserTokenRepository;
+import co.com.udem.agenciainmobiliariaclient.util.Balanceador;
 import co.com.udem.agenciainmobiliariaclient.util.Constantes;
 import co.com.udem.agenciainmobiliariaclient.util.MapearRespuesta;
 
 @RestController
 public class PropiedadRestController {
 
-	private static final String PROPIEDAD = "propiedad/";
+	private static final String PROPIEDAD = "/agenciaInmobiliaria/propiedad/";
 
 	@Autowired
 	RestTemplate restTemplate;
 
 	@Autowired
+	Balanceador balanceador;
+	
+	@Autowired
 	UserTokenRepository userTokenRepository;
 
 	@Autowired
 	UserToken userToken;
-
-	@Value("${url.servicio}")
-	public String url;
 
 	@GetMapping("/consultarPropiedades")
 	public ResponseEntity<Object> listarPropiedades() {
@@ -52,8 +52,8 @@ public class PropiedadRestController {
 		headers.set(Constantes.AUTHORIZATION, Constantes.BEARER + userToken.getToken());
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + "/propiedades", HttpMethod.GET, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + "/agenciaInmobiliaria/propiedades",
+					HttpMethod.GET, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -68,7 +68,7 @@ public class PropiedadRestController {
 			@RequestParam(value = "precioIni", required = false) BigInteger precioIni,
 			@RequestParam(value = "precioFinal", required = false) BigInteger precioFinal) {
 
-		String urlServices = url + "propiedades/filtros/";
+		String urlServices = balanceador.urlBalanceador() + "/agenciaInmobiliaria/propiedades/filtros/";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -100,8 +100,8 @@ public class PropiedadRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + PROPIEDAD + id, HttpMethod.GET, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + PROPIEDAD + id,
+					HttpMethod.GET, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
 		} catch (HttpStatusCodeException e) {
@@ -119,8 +119,8 @@ public class PropiedadRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + PROPIEDAD + id, HttpMethod.DELETE, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + PROPIEDAD + id,
+					HttpMethod.DELETE, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -140,8 +140,8 @@ public class PropiedadRestController {
 		HttpEntity<PropiedadDTO> entity = new HttpEntity<>(propiedadDTO, headers);
 
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + "adicionarPropiedad", HttpMethod.POST, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + "/agenciaInmobiliaria/adicionarPropiedad",
+					HttpMethod.POST, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
 
@@ -160,8 +160,8 @@ public class PropiedadRestController {
 
 		HttpEntity<PropiedadDTO> entity = new HttpEntity<>(propiedadDTO, headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + PROPIEDAD + id, HttpMethod.PUT, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + PROPIEDAD + id,
+					HttpMethod.PUT, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
 		} catch (HttpStatusCodeException e) {

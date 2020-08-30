@@ -1,7 +1,6 @@
 package co.com.udem.agenciainmobiliariaclient.rest.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,13 +19,14 @@ import org.springframework.web.client.RestTemplate;
 import co.com.udem.agenciainmobiliariaclient.domain.TipoIdentificacionDTO;
 import co.com.udem.agenciainmobiliariaclient.entities.UserToken;
 import co.com.udem.agenciainmobiliariaclient.repositories.UserTokenRepository;
+import co.com.udem.agenciainmobiliariaclient.util.Balanceador;
 import co.com.udem.agenciainmobiliariaclient.util.Constantes;
 import co.com.udem.agenciainmobiliariaclient.util.MapearRespuesta;
 
 @RestController
 public class TipoIdentificacionRestController {
 
-	private static final String TIPOS_DOCUMENTOS = "tiposDocumentos/";
+	private static final String TIPOS_DOCUMENTOS = "/agenciaInmobiliaria/tiposDocumentos/";
 
 	@Autowired
 	RestTemplate restTemplate;
@@ -35,10 +35,10 @@ public class TipoIdentificacionRestController {
 	UserTokenRepository userTokenRepository;
 
 	@Autowired
-	UserToken userToken;
+	Balanceador balanceador;
 
-	@Value("${url.servicio}")
-	public String url;
+	@Autowired
+	UserToken userToken;
 
 	@GetMapping("/consultarTipoDocumentos")
 	public ResponseEntity<Object> listarTiposDocumentos() {
@@ -48,8 +48,8 @@ public class TipoIdentificacionRestController {
 		headers.set(Constantes.AUTHORIZATION, Constantes.BEARER + userToken.getToken());
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + "tiposDocumentos", HttpMethod.GET, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + "/agenciaInmobiliaria/tiposDocumentos",
+					HttpMethod.GET, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -68,8 +68,8 @@ public class TipoIdentificacionRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + TIPOS_DOCUMENTOS + id, HttpMethod.GET, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(
+					balanceador.urlBalanceador() + TIPOS_DOCUMENTOS + id, HttpMethod.GET, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
@@ -87,8 +87,8 @@ public class TipoIdentificacionRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + TIPOS_DOCUMENTOS + id, HttpMethod.DELETE,
-					entity, String.class);
+			ResponseEntity<String> response = restTemplate.exchange(
+					balanceador.urlBalanceador() + TIPOS_DOCUMENTOS + id, HttpMethod.DELETE, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -108,8 +108,8 @@ public class TipoIdentificacionRestController {
 		HttpEntity<TipoIdentificacionDTO> entity = new HttpEntity<>(tipoIdentificacionDTO, headers);
 
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + "adicionarTipoDocumento", HttpMethod.POST,
-					entity, String.class);
+			ResponseEntity<String> response = restTemplate.exchange(
+					balanceador.urlBalanceador() + "/agenciaInmobiliaria/adicionarTipoDocumento", HttpMethod.POST, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
 
@@ -129,8 +129,8 @@ public class TipoIdentificacionRestController {
 
 		HttpEntity<TipoIdentificacionDTO> entity = new HttpEntity<>(tipoIdentificacionDTO, headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + TIPOS_DOCUMENTOS + id, HttpMethod.PUT, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(
+					balanceador.urlBalanceador() + TIPOS_DOCUMENTOS + id, HttpMethod.PUT, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
 

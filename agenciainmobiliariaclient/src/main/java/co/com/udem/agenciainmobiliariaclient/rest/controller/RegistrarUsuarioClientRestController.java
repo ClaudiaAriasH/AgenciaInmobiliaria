@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.http.HttpEntity;
@@ -30,13 +29,14 @@ import co.com.udem.agenciainmobiliariaclient.domain.AutenticationResponseDTO;
 import co.com.udem.agenciainmobiliariaclient.domain.RegistrarUsuarioDTO;
 import co.com.udem.agenciainmobiliariaclient.entities.UserToken;
 import co.com.udem.agenciainmobiliariaclient.repositories.UserTokenRepository;
+import co.com.udem.agenciainmobiliariaclient.util.Balanceador;
 import co.com.udem.agenciainmobiliariaclient.util.Constantes;
 import co.com.udem.agenciainmobiliariaclient.util.MapearRespuesta;
 
 @RestController
 public class RegistrarUsuarioClientRestController {
 
-	private static final String USUARIOS = "usuarios/";
+	private static final String USUARIOS = "/agenciaInmobiliaria/usuarios/";
 	private static final Logger logger = LogManager.getLogger(RegistrarUsuarioClientRestController.class);
 	@Autowired
 	RestTemplate restTemplate;
@@ -45,20 +45,20 @@ public class RegistrarUsuarioClientRestController {
 	UserTokenRepository userTokenRepository;
 
 	@Autowired
+	Balanceador balanceador;
+
+	@Autowired
 	UserToken userToken;
+
 	@Autowired
 	private LoadBalancerClient loadBalancer;
-
-	@Value("${url.servicio}")
-	public String url;
 
 	@PostMapping("/autenticar")
 	public String autenticar(@RequestBody AutenticationRequestDTO autenticationRequestDTO) {
 
-		ServiceInstance serviceInstance = loadBalancer.choose("agenciainmobiliaria");
-		logger.info(serviceInstance.getUri());
-		String baseUrl = serviceInstance.getUri().toString();
+		String baseUrl = balanceador.urlBalanceador();
 		baseUrl = baseUrl + "/auth/signin";
+		
 		ResponseEntity<String> postResponse = restTemplate.postForEntity(baseUrl, autenticationRequestDTO,
 				String.class);
 		logger.info("Respuesta Token: ");
@@ -81,7 +81,7 @@ public class RegistrarUsuarioClientRestController {
 			userTokenRepository.save(userToken);
 		}
 
-		logger.info("Respuesta Token: ");
+
 
 		return autenticationResponseDTO.getToken();
 
@@ -95,7 +95,8 @@ public class RegistrarUsuarioClientRestController {
 		headers.set(Constantes.AUTHORIZATION, Constantes.BEARER + userToken.getToken());
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + "usuarios", HttpMethod.GET, entity,
+			ResponseEntity<String> response = restTemplate.exchange(
+					balanceador.urlBalanceador() + "/agenciaInmobiliaria/usuarios", HttpMethod.GET, entity,
 					String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
@@ -115,8 +116,8 @@ public class RegistrarUsuarioClientRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + USUARIOS + id, HttpMethod.GET, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + USUARIOS + id,
+					HttpMethod.GET, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -135,8 +136,8 @@ public class RegistrarUsuarioClientRestController {
 
 		HttpEntity<String> entity = new HttpEntity<>(headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + USUARIOS + id, HttpMethod.DELETE, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + USUARIOS + id,
+					HttpMethod.DELETE, entity, String.class);
 
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 
@@ -148,9 +149,14 @@ public class RegistrarUsuarioClientRestController {
 	@PostMapping("/registrarUsuario")
 	public ResponseEntity<Object> registrarUsuario(@RequestBody RegistrarUsuarioDTO registrarUsuarioDTO) {
 
+		ServiceInstance serviceInstance = loadBalancer.choose("agenciainmobiliaria");
+
+		String baseUrl = serviceInstance.getUri().toString();
+		baseUrl = baseUrl + "/agenciaInmobiliaria/adicionarUsuario";
+
 		try {
-			ResponseEntity<String> response = restTemplate.postForEntity(url + "adicionarUsuario", registrarUsuarioDTO,
-					String.class);
+			ResponseEntity<String> response = restTemplate.postForEntity(baseUrl, registrarUsuarioDTO, String.class);
+
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
 
@@ -171,8 +177,8 @@ public class RegistrarUsuarioClientRestController {
 
 		HttpEntity<RegistrarUsuarioDTO> entity = new HttpEntity<>(registrarUsuarioDTO, headers);
 		try {
-			ResponseEntity<String> response = restTemplate.exchange(url + servicio + id, HttpMethod.PUT, entity,
-					String.class);
+			ResponseEntity<String> response = restTemplate.exchange(balanceador.urlBalanceador() + servicio + id,
+					HttpMethod.PUT, entity, String.class);
 			return MapearRespuesta.mapearRespuestaExitosa(response);
 		} catch (HttpStatusCodeException e) {
 

@@ -4,6 +4,8 @@ package co.com.udem.agenciainmobiliaria.rest.contoller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +36,7 @@ import co.com.udem.agenciainmobiliaria.util.ConvertTipoIdentificacion;
 
 @SpringBootTest(classes = AgenciainmobiliariaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PropiedadRestControllerTest {
+	private static final Logger logger = LogManager.getLogger(PropiedadRestControllerTest.class);
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -86,7 +89,7 @@ public class PropiedadRestControllerTest {
 		HttpEntity<PropiedadDTO> entity = new HttpEntity<PropiedadDTO>(propiedadDTO, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(
 				getRootUrl() + "/agenciaInmobiliaria/adicionarPropiedad", HttpMethod.POST, entity, String.class);
-		System.err.println("adicionarPropiedadTest-> " + response);
+		logger.info("adicionarPropiedadTest-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 
 	}
@@ -97,7 +100,7 @@ public class PropiedadRestControllerTest {
 		HttpEntity<String> entity = new HttpEntity<String>(null, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/propiedad/1",
 				HttpMethod.GET, entity, String.class);
-		System.err.println("buscarPropiedadTest-> " + response);
+		logger.info("buscarPropiedadTest-> " + response);
 		assertNotNull(response.getBody());
 	}
 
@@ -108,7 +111,7 @@ public class PropiedadRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/propiedades",
 				HttpMethod.GET, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("listarPropiedades-> " + response);
+		logger.info("listarPropiedades-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 	}
 
@@ -129,7 +132,7 @@ public class PropiedadRestControllerTest {
 		HttpEntity<PropiedadDTO> entity = new HttpEntity<PropiedadDTO>(propiedadDTO, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/propiedad/" + id,
 				HttpMethod.PUT, entity, String.class);
-		System.err.println("actualizarPropiedadesTest-> " + response);
+		logger.info("actualizarPropiedadesTest-> " + response);
 		assertNotNull(response.getBody());
 	}
 
@@ -140,7 +143,7 @@ public class PropiedadRestControllerTest {
 		HttpEntity<String> entity = new HttpEntity<String>(null, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/propiedad/" + id,
 				HttpMethod.DELETE, entity, String.class);
-		System.err.println("eliminarPropiedadTest-> " + response);
+		logger.info("eliminarPropiedadTest-> " + response);
 		assertNotNull(response);
 		assertNotNull(response.getBody());
 	}
@@ -152,7 +155,7 @@ public class PropiedadRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(
 				getRootUrl() + "/agenciaInmobiliaria/propiedades/filtros/?area=65m2", HttpMethod.GET, entity,
 				String.class);
-		System.out.println("filtrarPorHabitaciones-> " + response);
+		logger.info("filtrarPorHabitaciones-> " + response);
 		assertNotNull(response);
 		assertNotNull(response.getBody());
 	}
@@ -187,7 +190,7 @@ public class PropiedadRestControllerTest {
 			tipoIdentificacionRepository.save(tipoIdentificacion);
 		} catch (Exception e) {
 
-			System.err.println("Fallo al guardar el tipo de documento.");
+			logger.error("Fallo al guardar el tipo de documento.");
 		}
 
 	}

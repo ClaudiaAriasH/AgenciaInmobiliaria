@@ -3,6 +3,8 @@ package co.com.udem.agenciainmobiliaria.rest.contoller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +34,7 @@ import co.com.udem.agenciainmobiliaria.util.ConvertTipoIdentificacion;
 
 @SpringBootTest(classes = AgenciainmobiliariaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TipoDocumentoRestControllerTest {
+	private static final Logger logger = LogManager.getLogger(TipoDocumentoRestControllerTest.class);
 
 	@Autowired
 	private TestRestTemplate restTemplate;
@@ -77,7 +80,7 @@ public class TipoDocumentoRestControllerTest {
 				this.construiHeaders());
 		ResponseEntity<String> reponse = restTemplate.exchange(
 				getRootUrl() + "/agenciaInmobiliaria/adicionarTipoDocumento", HttpMethod.POST, entity, String.class);
-		System.err.println("adicionarTipoDocumentoTest-> " + reponse);
+		logger.info("adicionarTipoDocumentoTest-> " + reponse);
 		assertEquals(200, reponse.getStatusCode().value());
 
 	}
@@ -88,7 +91,7 @@ public class TipoDocumentoRestControllerTest {
 		HttpEntity<String> entity = new HttpEntity<String>(null, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/tiposDocumentos/1",
 				HttpMethod.GET, entity, String.class);
-		System.err.println("buscarTipoDocumentoTest-> " + response);
+		logger.info("buscarTipoDocumentoTest-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 	}
 
@@ -99,7 +102,7 @@ public class TipoDocumentoRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/tiposDocumentos",
 				HttpMethod.GET, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("listarTiposDocumentos-> " + response);
+		logger.info("listarTiposDocumentos-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 	}
 
@@ -114,7 +117,7 @@ public class TipoDocumentoRestControllerTest {
 				this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(
 				getRootUrl() + "/agenciaInmobiliaria/tiposDocumentos/" + id, HttpMethod.PUT, entity, String.class);
-		System.err.println("actualizarTipoDocumentoTest-> " + response);
+		logger.info("actualizarTipoDocumentoTest-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 	}
 
@@ -125,7 +128,7 @@ public class TipoDocumentoRestControllerTest {
 		HttpEntity<String> entity = new HttpEntity<String>(null, this.construiHeaders());
 		ResponseEntity<String> response = restTemplate.exchange(
 				getRootUrl() + "/agenciaInmobiliaria/tiposDocumentos/" + id, HttpMethod.DELETE, entity, String.class);
-		System.err.println("eliminarUsuarioTest-> " + response);
+		logger.info("eliminarUsuarioTest-> " + response);
 		assertEquals(200, response.getStatusCode().value());
 	}
 
@@ -140,7 +143,7 @@ public class TipoDocumentoRestControllerTest {
 			tipoIdentificacionRepository.save(tipoIdentificacion);
 		} catch (Exception e) {
 
-			System.err.println("Fallo al guardar el tipo de documento.");
+			logger.error("Fallo al guardar el tipo de documento.");
 		}
 
 	}

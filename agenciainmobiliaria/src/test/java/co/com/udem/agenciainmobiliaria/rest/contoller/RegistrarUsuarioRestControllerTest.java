@@ -2,6 +2,8 @@ package co.com.udem.agenciainmobiliaria.rest.contoller;
 
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +32,7 @@ import co.com.udem.agenciainmobiliaria.util.ConvertTipoIdentificacion;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = AgenciainmobiliariaApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RegistrarUsuarioRestControllerTest {
-
+	private static final Logger logger = LogManager.getLogger(RegistrarUsuarioRestControllerTest.class);
 	private String token;
 
 	@Autowired
@@ -72,7 +74,7 @@ public class RegistrarUsuarioRestControllerTest {
 				getRootUrl() + "/agenciaInmobiliaria/adicionarUsuario", registrolDTO, RegistrarUsuarioDTO.class);
 		assertNotNull(postResponse);
 		assertNotNull(postResponse.getBody());
-		System.err.println("adicionarUsuarioTest-> " + postResponse);
+		logger.info("adicionarUsuarioTest-> " + postResponse);
 	}
 
 	@Test
@@ -81,7 +83,7 @@ public class RegistrarUsuarioRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/usuarios",
 				HttpMethod.GET, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("testObtenerUsuarios-> " + response);
+		logger.info("testObtenerUsuarios-> " + response);
 	}
 
 	@Test
@@ -90,7 +92,7 @@ public class RegistrarUsuarioRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/usuarios/1",
 				HttpMethod.GET, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("buscarUsuarioTest-> " + response);
+		logger.info("buscarUsuarioTest-> " + response);
 	}
 
 	@Test
@@ -103,7 +105,7 @@ public class RegistrarUsuarioRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/usuarios/" + id,
 				HttpMethod.PUT, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("modificarUsuarioTest-> " + response);
+		logger.info("modificarUsuarioTest-> " + response);
 	}
 
 	@Test
@@ -113,7 +115,7 @@ public class RegistrarUsuarioRestControllerTest {
 		ResponseEntity<String> response = restTemplate.exchange(getRootUrl() + "/agenciaInmobiliaria/usuarios/" + id,
 				HttpMethod.DELETE, entity, String.class);
 		assertNotNull(response.getBody());
-		System.err.println("eliminarUsuarioTest-> " + response);
+		logger.info("eliminarUsuarioTest-> " + response);
 	}
 
 	private RegistrarUsuarioDTO setearRegistrarUsuarioDTO(String telefono) {
@@ -142,7 +144,7 @@ public class RegistrarUsuarioRestControllerTest {
 			tipoIdentificacionRepository.save(tipoid);
 		} catch (Exception e) {
 
-			System.err.println("No se pudo guardar registro en BD");
+			logger.error("No se pudo guardar registro en BD");
 		}
 
 	}
